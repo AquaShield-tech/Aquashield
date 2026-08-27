@@ -1,58 +1,67 @@
--- Arquivo de apoio, caso você queira criar tabelas como as aqui criadas para a API funcionar.
--- Você precisa executar os comandos no banco de dados para criar as tabelas,
--- ter este arquivo aqui não significa que a tabela em seu BD estará como abaixo!
-
-/*
-comandos para mysql server
-*/
-
-CREATE DATABASE aquatech;
-
-USE aquatech;
+DROP DATABASE IF EXISTS aquashield;
+CREATE DATABASE IF NOT EXISTS aquashield;
 
 CREATE TABLE empresa (
-	id INT PRIMARY KEY AUTO_INCREMENT,
-	razao_social VARCHAR(50),
-	cnpj CHAR(14),
-	codigo_ativacao VARCHAR(50)
+    idEmpresa INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL,
+    cnpj CHAR(14),
+    email VARCHAR(50)
+); 
+
+CREATE TABLE cargo (
+idCargo INT PRIMARY KEY AUTO_INCREMENT,
+nome VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE usuario (
-	id INT PRIMARY KEY AUTO_INCREMENT,
-	nome VARCHAR(50),
-	email VARCHAR(50),
-	senha VARCHAR(50),
-	fk_empresa INT,
-	FOREIGN KEY (fk_empresa) REFERENCES empresa(id)
+id INT PRIMARY KEY AUTO_INCREMENT,
+nome VARCHAR(50),
+email VARCHAR(50),
+senha VARCHAR(50),
+fkCargo INT,
+fkEmpresa INT,
+CONSTRAINT fkUsuarioCargo FOREIGN KEY (fkCargo) REFERENCES cargo(idCargo),
+CONSTRAINT fkUsuarioEmpresa FOREIGN KEY (fkEmpresa) REFERENCES empresa(idEmpresa)
 );
 
-CREATE TABLE aviso (
-	id INT PRIMARY KEY AUTO_INCREMENT,
-	titulo VARCHAR(100),
-	descricao VARCHAR(150),
-	fk_usuario INT,
-	FOREIGN KEY (fk_usuario) REFERENCES usuario(id)
-);
+CREATE TABLE maquinas(
+idMaquina INT PRIMARY KEY AUTO_INCREMENT,
+nome VARCHAR(100),
+fkEmpresa INT,
+CONSTRAINT fkEmpresa FOREIGN KEY (fkEmpresa) REFERENCES Empresa(idEmpresa));
 
-create table aquario (
-/* em nossa regra de negócio, um aquario tem apenas um sensor */
-	id INT PRIMARY KEY AUTO_INCREMENT,
-	descricao VARCHAR(300),
-	fk_empresa INT,
-	FOREIGN KEY (fk_empresa) REFERENCES empresa(id)
-);
 
-/* esta tabela deve estar de acordo com o que está em INSERT de sua API do arduino - dat-acqu-ino */
-
-create table medida (
-	id INT PRIMARY KEY AUTO_INCREMENT,
-	temperatura DECIMAL,
-	momento DATETIME,
-	fk_aquario INT,
-	FOREIGN KEY (fk_aquario) REFERENCES aquario(id)
-);
-
-insert into empresa (razao_social, codigo_ativacao) values ('Empresa 1', 'ED145B');
-insert into empresa (razao_social, codigo_ativacao) values ('Empresa 2', 'A1B2C3');
-insert into aquario (descricao, fk_empresa) values ('Aquário de Estrela-do-mar', 1);
-insert into aquario (descricao, fk_empresa) values ('Aquário de Peixe-dourado', 2);
+CREATE TABLE Processador(
+ id INT PRIMARY KEY AUTO_INCREMENT,
+ temperatura DECIMAL(3,1),
+ frequencia DECIMAL(7,2),
+ porcentagem_de_uso DECIMAL(5,2),
+ fkMaquina INT,
+ fkEmpresa INT,
+ CONSTRAINT fkMaquina FOREIGN KEY (fkMaquina) REFERENCES Maquina(idMaquina),
+ CONSTRAINT fkEmpresa FOREIGN KEY (fkEmpresa) REFERENCES Empresa(idEmpresa));
+ 
+ 
+ CREATE TABLE memoria(
+ idMemoria INT PRIMARY KEY AUTO_INCREMENT,
+ memoria_usada INT,
+ memoria_disponivel INT,
+ fkMaquina INT,
+ fkEmpresa INT,
+ CONSTRAINT fkMaquina FOREIGN KEY (fkMaquina) REFERENCES Maquina(idMaquina),
+ CONSTRAINT fkEmpresa FOREIGN KEY (fkEmpresa) REFERENCES Empresa(idEmpresa)
+ );
+ 
+ CREATE TABLE disco(
+ idDisco INT PRIMARY KEY AUTO_INCREMENT,
+ discoUso INT,
+ espaçoLivre INT,
+ fkMaquina INT,
+ fkEmpresa INT,
+ CONSTRAINT fkMaquina FOREIGN KEY (fkMaquina) REFERENCES Maquina(idMaquina),
+ CONSTRAINT fkEmpresa FOREIGN KEY (fkEmpresa) REFERENCES Empresa(idEmpresa)
+ );
+ 
+INSERT INTO cargo (id,nome) VALUES
+(1,"Técnico de Automação"),
+(2,"Controlador de Sistemas De Saneamento")
